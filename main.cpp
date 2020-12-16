@@ -23,12 +23,9 @@ int main() {
     // cout<<word<<endl;
     wordCount++;
   }
-  cout<<"Reading Complete\n"
-
-  
+  cout<<"Reading Complete\n";
 
   fileReader.close();
 
-  cout<<"Total words: "<<wordCount<<endl;
-
+  cout<<"Total Words Read: "<<wordCount<<endl;
 }
