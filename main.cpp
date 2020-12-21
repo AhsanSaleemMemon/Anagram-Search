@@ -157,8 +157,9 @@ int main()
       word = "";
       fileReader>>word;
       if(hashTable.hasPunctuation(word)!=true){ // Punctuated words won't be inserted
-        keyWord = hashTable.sortAlpha(word);
         string loweredWord = hashTable.convertToLower(word);
+        keyWord = hashTable.sortAlpha(loweredWord);
+       
       
         hashTable.insert(keyWord, loweredWord);
       }
@@ -181,7 +182,8 @@ int main()
           cout<<"Word: "<<inputWord<<endl;
           outputWriter << inputWord << ": ";
           string loweredInput = hashTable.convertToLower(inputWord);
-          string inputKey = hashTable.sortAlpha(inputWord);
+
+          string inputKey = hashTable.sortAlpha(loweredInput);
           cout<<"Hash Key: "<<inputKey<<"\n";
           hashTable.Search(inputKey,outputWriter,loweredInput);
         }

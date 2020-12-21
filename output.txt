@@ -1,9 +1,9 @@
-result: 1 rustle 
+result: 2 rustle ulster 
 finger: 1 fringe 
 except: 1 expect 
 hail: 0 
 hair: 0 
-citrus: 1 rustic 
+citrus: 2 curtis rustic 
 strive: 0 
 ample: 1 maple 
 corpse: 0 
