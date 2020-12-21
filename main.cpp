@@ -7,12 +7,9 @@
 #include <cctype>
 #include <algorithm>
 using namespace std;
-const int TABLE_SIZE = 200000;
+const int TABLE_SIZE = 200000; // size of the hashTable
  
-/*
- * HashNode Class Declaration
- */
-class HashNode
+class HashNode  // HashNode for a single word anagrams
 {
   public:
     string key;
@@ -25,125 +22,130 @@ class HashNode
         this->next = NULL;
     }
 };
- 
-/*
- * HashMap Class Declaration
- */
-class HashMap1
-{
+
+class HashMap // This will contain a 2d pointer of HashNode which will contain 
+{             // multiple anagram pointers at each row
     private:
         HashNode** htable;
     public:
-        HashMap1()
+        HashMap() // Default Constructor
         {   
             htable = new HashNode*[TABLE_SIZE];
             for (int i = 0; i < TABLE_SIZE; i++)
                 htable[i] = NULL;
         }
-        ~HashMap1()
+        ~HashMap() // Destructor
         {
-            for (int i = 0; i < TABLE_SIZE; ++i)
-	    {
-                HashNode* entry = htable[i];
-                while (entry != NULL)
+          for (int i = 0; i < TABLE_SIZE; ++i)
 	        {
-                    HashNode* prev = entry;
-                    entry = entry->next;
-                    delete prev;
-                }
-            }
-            delete[] htable;
+              HashNode* entry = htable[i];
+              while (entry != NULL)
+	            {
+                HashNode* prev = entry;
+                entry = entry->next;
+                delete prev;
+              }
+          }
+          delete[] htable;
         }
 
-        string convertToLower(string word){
+        string convertToLower(string word){ // for converting a word to Lower Case
           for (int i=0;i<word.length();i++){
               // cout<<i<<endl;
               word[i] = tolower(word[i]);
               // cout<<word[i];
           }
           return word;
-
         }
-
-        
-        string sortAlpha(string word){
+        string sortAlpha(string word){ // Sorting the word to make a hash Key
           	sort(word.begin(), word.end());
 	          return word;
         }
 
-        /*
-         * Hash Function
-         */
-        int HashFunc(string key)
+        int HashFunc(string key) // Hash Function to generate index from the given key
         {
           // cout<<"Key: "<<key<<endl;
           int hashVal = 0;
           for (int i = 0; i<key.length(); i++)
-            hashVal = 37 * hashVal + key[i];
+            hashVal = 43 * hashVal + key[i];
           hashVal %= TABLE_SIZE;
           if (hashVal<0)
             hashVal += TABLE_SIZE;
           // cout<<"hashVal: "<<hashVal<<endl;
           return hashVal;
         }
-          
-          
-        /*
-         * insert Element at a key
-         */
-        void insert(string key, string anagram)
+        void insert(string key, string anagram) // inserting an anagram into the hashTable with the given key
         {
-            int hash_v = HashFunc(key);
-            HashNode* p = NULL;
-            HashNode* en = htable[hash_v];
-            while (en!= NULL) {
-                p = en;
-                en = en->next;
+            int hash_val = HashFunc(key);
+            HashNode* prev = NULL;
+            HashNode* entry = htable[hash_val];
+            while (entry!= NULL) {
+                prev = entry;
+                entry = entry->next;
             }
-            if (en == NULL) {
-                en = new HashNode(key, anagram);
-                if (p == NULL) {
-                  htable[hash_v] = en;
+            if (entry == NULL) {
+                entry = new HashNode(key, anagram);
+                if (prev == NULL) {
+                  htable[hash_val] = entry;
                 } else {
-                  p->next = en;
+                  prev->next = entry;
                 }
             } else {
-                en->anagram = anagram;
+                entry->anagram = anagram;
             }
           }
       
-        void Search(string key)
+        bool hasPunctuation(string word){
+          for(int i=0;i<word.length();i++){
+            if(ispunct(word[i]))
+              return true;
+          }
+          return false;
+        }
+        void Search(string key,ofstream& fout, string word) // Search anagrams of a given word
         {   
           //  cout<<"Search function: "<<key<<endl;
             bool flag = false;
-            cout<<key<<": ";
+      
             int hash_val = HashFunc(key);
             // cout<<"Search: Key: "<<key<<", Index: "<<hash_val<<endl;
             HashNode* entry = htable[hash_val];
+            int count = 0;
+            string anagrams[50] = {""};
             while (entry != NULL)
-	          {
-                cout<<entry->anagram<<" ";
+	          {   
+              if(entry->anagram!=word){  // all anagrams other than the input word
+                anagrams[count] = entry->anagram;
+                count++;
+              }
+             //   cout<<entry->anagram<<" ";
                 entry = entry->next;
                 flag = true;
             }
             if (!flag)
                 cout<<"No Element Found at key: "<<hash_val<<endl;
-            cout<<endl;
+            fout<<count<<" ";
+            cout<<"Anagrams: ";
+            for (int i=0;anagrams[i]!="";i++){
+              
+              cout<<anagrams[i]<<" ";
+              fout<<anagrams[i]<<" ";
+            }
+            fout<<endl;
+            cout<<"\n\n";
         }
-
 };
-/*
- * Main Contains Menu
- */
+
 int main()
 {   
-    HashMap1 hashTable;
+    HashMap hashTable;
     
     ifstream fileReader;
     string word, keyWord;
     string inputWord;
     int wordCount = 0;
-    fileReader.open("words.txt"); 
+
+    fileReader.open("words.txt");  
     
     if(!fileReader){
       cout<<"File doesn't exist"<<endl;
@@ -151,20 +153,17 @@ int main()
     }
 
     cout<<"*** Reading dictionary ***"<<endl;
-    while(!fileReader.eof()){
+    while(!fileReader.eof()){ // Reading the dictionary file
       word = "";
       fileReader>>word;
-      // count++;
-      // cout<<word<<endl;
-      // cout<<"Word: "<<word<<endl;
-      keyWord = hashTable.sortAlpha(word);
-      string loweredWord = hashTable.convertToLower(word);
-      // loweredWord = hashTable.removeTrailingSpaces(loweredWord);
-      // cout<<"Without Spaces: "<<loweredWord.length()<<endl;
-      hashTable.insert(keyWord, loweredWord);
-
-     
+      if(hashTable.hasPunctuation(word)!=true){ // Punctuated words won't be inserted
+        keyWord = hashTable.sortAlpha(word);
+        string loweredWord = hashTable.convertToLower(word);
+      
+        hashTable.insert(keyWord, loweredWord);
+      }
     }
+    cout<<"Reading complete"<<endl;
 
     ifstream inputReader;
     inputReader.open("input.txt");
@@ -174,14 +173,21 @@ int main()
     if(!inputReader){
       cout<<"File doesn't exist"<<endl;
     }
+    cout<<"\n***Reading Input.txt***\n\n";
     while(!inputReader.eof()){
 
         inputReader>>inputWord;
-        outputWriter << inputWord << ": "<<endl;
-        string inputKey = hashTable.sortAlpha(inputWord);
-        hashTable.Search(inputKey);
+        if(hashTable.hasPunctuation(inputWord)!=true){
+          cout<<"Word: "<<inputWord<<endl;
+          outputWriter << inputWord << ": ";
+          string loweredInput = hashTable.convertToLower(inputWord);
+          string inputKey = hashTable.sortAlpha(inputWord);
+          cout<<"Hash Key: "<<inputKey<<"\n";
+          hashTable.Search(inputKey,outputWriter,loweredInput);
+        }
 
     }
+    cout<<"***All Anagrams searched, check the output.txt file***\n";
     outputWriter.close();
     inputReader.close();
     fileReader.close();

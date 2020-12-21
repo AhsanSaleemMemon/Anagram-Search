@@ -1,4 +1,14 @@
-who: 
-what: 
-hello: 
-tin: 
+result: 1 rustle 
+finger: 1 fringe 
+except: 1 expect 
+hail: 0 
+hair: 0 
+citrus: 1 rustic 
+strive: 0 
+ample: 1 maple 
+corpse: 0 
+puddingstone: 0 
+quad: 0 
+race: 2 acre care 
+recumbent: 0 
+tate: 1 teat 
